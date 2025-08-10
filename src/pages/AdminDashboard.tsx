@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { 
   Server, 
   Database, 
@@ -228,6 +229,29 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      <ChatAssistant 
+        context={{
+          systemHealth: {
+            api: { status: 'online', uptime: '99.9%' },
+            database: { status: 'online', uptime: '99.8%' },
+            aiAgent: { status: 'online', uptime: '98.5%' },
+            whatsapp: { status: 'online', uptime: '97.2%' }
+          },
+          users: [
+            { name: 'João Silva', role: 'Admin', lastAccess: '2 min atrás', status: 'active' },
+            { name: 'Maria Santos', role: 'Manager', lastAccess: '15 min atrás', status: 'active' },
+            { name: 'Pedro Costa', role: 'Manager', lastAccess: '1 hora atrás', status: 'inactive' }
+          ],
+          logs: [
+            { time: '14:30', type: 'INFO', message: 'Sistema de backup executado com sucesso' },
+            { time: '14:25', type: 'INFO', message: 'Novo usuário cadastrado: ana@empresa.com' },
+            { time: '14:20', type: 'WARN', message: 'Alto uso de CPU detectado (85%)' }
+          ]
+        }}
+        title="Assistente Admin"
+        placeholder="Pergunte sobre o sistema, usuários ou logs..."
+      />
     </div>
   );
 }

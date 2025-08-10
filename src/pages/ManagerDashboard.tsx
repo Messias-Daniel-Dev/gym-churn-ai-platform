@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/dashboard/MetricCard';
+import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Users, 
@@ -289,6 +290,33 @@ export default function ManagerDashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      <ChatAssistant 
+        context={{
+          kpis: {
+            totalUsers: 1247,
+            churnRate: 12,
+            retentionRate: 87.7,
+            avgLifeValue: 2450
+          },
+          riskUsers: [
+            { name: 'Maria Silva', email: 'maria@email.com', risk: 85, factor: 'Baixa frequência (7 dias sem treinar)' },
+            { name: 'João Santos', email: 'joao@email.com', risk: 89, factor: 'Pagamento em atraso há 5 dias' },
+            { name: 'Ana Costa', email: 'ana@email.com', risk: 78, factor: 'Cancelou 2 aulas seguidas' }
+          ],
+          teamPerformance: [
+            { name: 'Ana Costa', actions: 45, success: 92, avgTime: '2.1min' },
+            { name: 'Bruno Lima', actions: 38, success: 88, avgTime: '2.8min' },
+            { name: 'Carla Santos', actions: 31, success: 85, avgTime: '3.2min' }
+          ],
+          campaigns: [
+            { name: 'Volta Natação', roi: 1800, success: 65, participants: 23 },
+            { name: 'Plano Família', roi: 2700, success: 72, participants: 18 }
+          ]
+        }}
+        title="Assistente Gestor"
+        placeholder="Analise KPIs, usuários em risco ou campanhas..."
+      />
     </div>
   );
 }
