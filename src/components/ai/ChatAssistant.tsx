@@ -3,18 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, Send, Bot, User, Loader2, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { googleAI } from '@/services/ai/googleAI';
+import { openAIVoice } from '@/services/ai/openAI';
+import { useVoiceRecording } from '@/hooks/useVoiceRecording';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'assistant';
   timestamp: Date;
+  audioUrl?: string; // For TTS audio
 }
 
 interface ChatAssistantProps {
-  context?: any; // Dashboard data context for analysis
+  context?: any;
   title?: string;
   placeholder?: string;
 }
@@ -35,7 +38,12 @@ export function ChatAssistant({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -44,6 +52,39 @@ export function ChatAssistant({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const playAudio = async (audioUrl: string) => {
+    try {
+      setIsPlayingAudio(true);
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      
+      audioRef.current = new Audio(audioUrl);
+      audioRef.current.onended = () => setIsPlayingAudio(false);
+      await audioRef.current.play();
+    } catch (error) {
+      console.error('Erro ao reproduzir áudio:', error);
+      setIsPlayingAudio(false);
+    }
+  };
+
+  const handleVoiceInput = async () => {
+    if (isRecording) {
+      try {
+        const transcription = await stopRecording();
+        setInputValue(transcription);
+      } catch (error) {
+        console.error('Erro na transcrição:', error);
+      }
+    } else {
+      try {
+        await startRecording();
+      } catch (error) {
+        console.error('Erro ao iniciar gravação:', error);
+      }
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -63,21 +104,38 @@ export function ChatAssistant({
       let response: string;
       
       if (context) {
-        // If we have dashboard context, use it for data analysis
+        // Gemini analyzes dashboard data
         response = await googleAI.analyzeData(context, inputValue);
       } else {
-        // General conversation
+        // Gemini for general conversation
         response = await googleAI.generateResponse(inputValue);
+      }
+
+      let audioUrl: string | undefined;
+      
+      // Generate voice response if enabled
+      if (voiceEnabled) {
+        try {
+          audioUrl = await openAIVoice.textToSpeech(response);
+        } catch (error) {
+          console.error('Erro ao gerar áudio:', error);
+        }
       }
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: response,
         sender: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
+        audioUrl
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Auto-play audio if voice is enabled
+      if (audioUrl && voiceEnabled) {
+        setTimeout(() => playAudio(audioUrl), 500);
+      }
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       const errorMessage: Message = {
@@ -118,14 +176,24 @@ export function ChatAssistant({
           <Bot className="h-4 w-4 text-primary" />
           {title}
         </CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsExpanded(false)}
-          className="h-6 w-6 p-0"
-        >
-          ×
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setVoiceEnabled(!voiceEnabled)}
+            className={`h-6 w-6 p-0 ${voiceEnabled ? 'text-primary' : 'text-muted-foreground'}`}
+          >
+            {voiceEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(false)}
+            className="h-6 w-6 p-0"
+          >
+            ×
+          </Button>
+        </div>
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-4 pt-0">
@@ -151,6 +219,17 @@ export function ChatAssistant({
                   }`}
                 >
                   {message.content}
+                  {message.audioUrl && message.sender === 'assistant' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => playAudio(message.audioUrl!)}
+                      className="ml-2 h-6 w-6 p-0"
+                      disabled={isPlayingAudio}
+                    >
+                      <Volume2 className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
                 {message.sender === 'user' && (
                   <div className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-1">
@@ -179,12 +258,20 @@ export function ChatAssistant({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
-            disabled={isLoading}
+            disabled={isLoading || isRecording || isTranscribing}
             className="flex-1"
           />
           <Button 
+            onClick={handleVoiceInput}
+            disabled={isLoading || isTranscribing}
+            size="icon"
+            variant={isRecording ? "destructive" : "outline"}
+          >
+            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+          </Button>
+          <Button 
             onClick={handleSendMessage}
-            disabled={isLoading || !inputValue.trim()}
+            disabled={isLoading || !inputValue.trim() || isRecording || isTranscribing}
             size="icon"
           >
             <Send className="h-4 w-4" />
