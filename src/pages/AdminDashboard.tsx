@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatAssistant } from '@/components/ai/ChatAssistant';
+import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { 
   Server, 
   Database, 
@@ -228,9 +229,12 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Alertas Inteligentes */}
+        <AlertPanel />
       </div>
       
-      <ChatAssistant 
+      <ChatAssistant
         context={{
           systemHealth: {
             api: { status: 'online', uptime: '99.9%' },

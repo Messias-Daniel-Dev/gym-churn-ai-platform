@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/dashboard/MetricCard';
 import { ChatAssistant } from '@/components/ai/ChatAssistant';
+import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Users, 
@@ -289,9 +290,12 @@ export default function ManagerDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Alertas Inteligentes */}
+        <AlertPanel />
       </div>
       
-      <ChatAssistant 
+      <ChatAssistant
         context={{
           kpis: {
             totalUsers: 1247,
