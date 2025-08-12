@@ -6,6 +6,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { AlertPanel } from '@/components/alerts/AlertPanel';
+import { SmartInsights } from '@/components/insights/SmartInsights';
+import { ConversationalReports } from '@/components/reports/ConversationalReports';
 import { 
   Server, 
   Database, 
@@ -230,8 +232,36 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Alertas Inteligentes */}
-        <AlertPanel />
+        {/* AI Features Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Smart Insights */}
+          <SmartInsights dashboardData={{
+            performance: {
+              responseTime: 2.3,
+              resolutionRate: 87,
+              messagesProcessed: 15678,
+              systemUptime: 99.9
+            },
+            churn: {
+              highRiskUsers: 4,
+              totalUsers: 1247,
+              churnRate: 12.5,
+              avgMessagesPerUser: 18.4
+            },
+            engagement: {
+              dailyActiveUsers: 856,
+              avgSessionDuration: 4.2,
+              messagesSentToday: 2341,
+              userSatisfaction: 4.2
+            }
+          }} />
+          
+          {/* Alertas Inteligentes */}
+          <AlertPanel />
+        </div>
+
+        {/* Conversational Reports */}
+        <ConversationalReports />
       </div>
       
       <ChatAssistant

@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/dashboard/MetricCard';
 import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { AlertPanel } from '@/components/alerts/AlertPanel';
+import { SmartInsights } from '@/components/insights/SmartInsights';
+import { ConversationalReports } from '@/components/reports/ConversationalReports';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Users, 
@@ -291,8 +293,14 @@ export default function ManagerDashboard() {
           </CardContent>
         </Card>
 
-        {/* Alertas Inteligentes */}
-        <AlertPanel />
+        {/* AI Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <SmartInsights autoRefresh={true} />
+          <AlertPanel />
+        </div>
+
+        {/* Conversational Reports */}
+        <ConversationalReports />
       </div>
       
       <ChatAssistant
