@@ -8,8 +8,10 @@ import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { SmartInsights } from '@/components/insights/SmartInsights';
 import { ConversationalReports } from '@/components/reports/ConversationalReports';
+import { UserModal } from '@/components/modals/UserModal';
+import { useState } from 'react';
 import { 
-  Server, 
+  Server,
   Database, 
   Bot, 
   Activity, 
@@ -26,6 +28,17 @@ import {
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
 
+  // Modal state
+  const [userModal, setUserModal] = useState({ isOpen: false, user: null });
+
+  // System users state
+  const [systemUsers, setSystemUsers] = useState([
+    { id: '1', name: 'Guilherme Silva', email: 'guilherme@demo.com', role: 'Gestor', lastAccess: '2h atrás', status: 'active' },
+    { id: '2', name: 'Ana Costa', email: 'ana@demo.com', role: 'Agente', lastAccess: '15min atrás', status: 'active' },
+    { id: '3', name: 'Bruno Lima', email: 'bruno@demo.com', role: 'Agente', lastAccess: '1h atrás', status: 'active' },
+    { id: '4', name: 'Carla Santos', email: 'carla@demo.com', role: 'Agente', lastAccess: '1 dia atrás', status: 'inactive' },
+  ]);
+
   const systemServices = [
     { name: 'API FastAPI', status: 'online', uptime: '99.9%', icon: Server },
     { name: 'PostgreSQL', status: 'online', uptime: '99.8%', icon: Database },
@@ -33,12 +46,22 @@ export default function AdminDashboard() {
     { name: 'API WhatsApp', status: 'warning', uptime: '97.2%', icon: Activity },
   ];
 
-  const systemUsers = [
-    { name: 'Guilherme Silva', role: 'Gestor', lastAccess: '2h atrás', status: 'active' },
-    { name: 'Ana Costa', role: 'Agente', lastAccess: '15min atrás', status: 'active' },
-    { name: 'Bruno Lima', role: 'Agente', lastAccess: '1h atrás', status: 'active' },
-    { name: 'Carla Santos', role: 'Agente', lastAccess: '1 dia atrás', status: 'inactive' },
-  ];
+  // Modal handlers
+  const handleEditUser = (user: any) => {
+    setUserModal({ isOpen: true, user });
+  };
+
+  const handleAddUser = () => {
+    setUserModal({ isOpen: true, user: null });
+  };
+
+  const handleSaveUser = (userData: any) => {
+    if (userData.id && systemUsers.find(u => u.id === userData.id)) {
+      setSystemUsers(systemUsers.map(u => u.id === userData.id ? userData : u));
+    } else {
+      setSystemUsers([...systemUsers, { ...userData, id: Date.now().toString() }]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -186,13 +209,21 @@ export default function AdminDashboard() {
                     <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
                       {user.status === 'active' ? 'Ativo' : 'Inativo'}
                     </Badge>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleEditUser(user)}
+                    >
                       Editar
                     </Button>
                   </div>
                 </div>
               ))}
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={handleAddUser}
+              >
                 <Users className="w-4 h-4 mr-2" />
                 Adicionar Usuário
               </Button>
@@ -263,6 +294,14 @@ export default function AdminDashboard() {
         {/* Conversational Reports */}
         <ConversationalReports />
       </div>
+
+      {/* User Modal */}
+      <UserModal
+        isOpen={userModal.isOpen}
+        onClose={() => setUserModal({ isOpen: false, user: null })}
+        user={userModal.user}
+        onSave={handleSaveUser}
+      />
       
       <ChatAssistant
         context={{

@@ -6,7 +6,11 @@ import { ChatAssistant } from '@/components/ai/ChatAssistant';
 import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { SmartInsights } from '@/components/insights/SmartInsights';
 import { ConversationalReports } from '@/components/reports/ConversationalReports';
+import { InterventionModal } from '@/components/modals/InterventionModal';
+import { CampaignModal } from '@/components/modals/CampaignModal';
+import { TeamReportModal } from '@/components/modals/TeamReportModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 import { 
   Users, 
   MessageSquare, 
@@ -26,6 +30,31 @@ import {
 
 export default function ManagerDashboard() {
   const { user, logout } = useAuth();
+
+  // Modal states
+  const [interventionModal, setInterventionModal] = useState({ isOpen: false, user: null });
+  const [campaignModal, setCampaignModal] = useState({ isOpen: false, campaign: null });
+  const [teamReportModal, setTeamReportModal] = useState(false);
+
+  // Add state import
+  const [campaigns, setCampaigns] = useState([
+    {
+      id: '1',
+      name: 'Volta Natação',
+      roi: 1800,
+      success: 65,
+      active: true,
+      participants: 23
+    },
+    {
+      id: '2', 
+      name: 'Plano Família',
+      roi: 2700,
+      success: 72,
+      active: true,
+      participants: 18
+    }
+  ]);
 
   const riskUsers = [
     {
@@ -60,22 +89,26 @@ export default function ManagerDashboard() {
     { name: 'Carla Santos', actions: 31, success: 85, avgTime: '3.2min' },
   ];
 
-  const campaigns = [
-    {
-      name: 'Volta Natação',
-      roi: 1800,
-      success: 65,
-      active: true,
-      participants: 23
-    },
-    {
-      name: 'Plano Família',
-      roi: 2700,
-      success: 72,
-      active: true,
-      participants: 18
+  // Modal handlers
+  const handleIntervention = (user: any) => {
+    setInterventionModal({ isOpen: true, user });
+  };
+
+  const handleCampaignManage = (campaign: any) => {
+    setCampaignModal({ isOpen: true, campaign });
+  };
+
+  const handleCreateCampaign = () => {
+    setCampaignModal({ isOpen: true, campaign: null });
+  };
+
+  const handleSaveCampaign = (campaignData: any) => {
+    if (campaignData.id && campaigns.find(c => c.id === campaignData.id)) {
+      setCampaigns(campaigns.map(c => c.id === campaignData.id ? campaignData : c));
+    } else {
+      setCampaigns([...campaigns, { ...campaignData, id: Date.now().toString() }]);
     }
-  ];
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -187,7 +220,11 @@ export default function ManagerDashboard() {
                     </div>
                   </div>
                   
-                  <Button className="w-full" size="sm">
+                  <Button 
+                    className="w-full" 
+                    size="sm"
+                    onClick={() => handleIntervention(user)}
+                  >
                     <Activity className="w-4 h-4 mr-2" />
                     Intervir Agora
                   </Button>
@@ -231,7 +268,11 @@ export default function ManagerDashboard() {
                 </div>
               ))}
               
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setTeamReportModal(true)}
+              >
                 Ver Relatório Completo
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
@@ -276,7 +317,11 @@ export default function ManagerDashboard() {
                     <span className="text-sm text-muted-foreground">
                       {campaign.participants} participantes
                     </span>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleCampaignManage(campaign)}
+                    >
                       Gerenciar
                     </Button>
                   </div>
@@ -285,7 +330,11 @@ export default function ManagerDashboard() {
             </div>
             
             <div className="mt-4">
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={handleCreateCampaign}
+              >
                 <Target className="w-4 h-4 mr-2" />
                 Criar Nova Campanha
               </Button>
@@ -302,6 +351,25 @@ export default function ManagerDashboard() {
         {/* Conversational Reports */}
         <ConversationalReports />
       </div>
+
+      {/* Modals */}
+      <InterventionModal
+        isOpen={interventionModal.isOpen}
+        onClose={() => setInterventionModal({ isOpen: false, user: null })}
+        user={interventionModal.user}
+      />
+
+      <CampaignModal
+        isOpen={campaignModal.isOpen}
+        onClose={() => setCampaignModal({ isOpen: false, campaign: null })}
+        campaign={campaignModal.campaign}
+        onSave={handleSaveCampaign}
+      />
+
+      <TeamReportModal
+        isOpen={teamReportModal}
+        onClose={() => setTeamReportModal(false)}
+      />
       
       <ChatAssistant
         context={{
