@@ -226,6 +226,37 @@ export function ConversationalReports() {
     }
   };
 
+  const generateNewReport = () => {
+    const reportTypes = ['daily', 'weekly', 'monthly'];
+    const categories = ['performance', 'churn', 'engagement'];
+    
+    const newReport: ConversationalReport = {
+      id: `report-${Date.now()}`,
+      title: `Relatório ${reportTypes[Math.floor(Math.random() * reportTypes.length)]} de ${categories[Math.floor(Math.random() * categories.length)]}`,
+      description: 'Relatório gerado automaticamente com base nos dados atuais',
+      type: reportTypes[Math.floor(Math.random() * reportTypes.length)] as any,
+      category: categories[Math.floor(Math.random() * categories.length)] as any,
+      generatedAt: new Date(),
+      data: {
+        metric1: Math.floor(Math.random() * 100),
+        metric2: Math.floor(Math.random() * 1000),
+        metric3: Math.floor(Math.random() * 50)
+      },
+      summary: 'Novo relatório gerado com métricas atualizadas do sistema.',
+      insights: [
+        'Insight automático gerado pela IA',
+        'Análise de tendências identificada',
+        'Recomendação baseada em dados'
+      ]
+    };
+
+    setReports([newReport, ...reports]);
+    toast({
+      title: "📊 Novo relatório gerado",
+      description: "Relatório criado com sucesso! Você pode gerar o áudio da explicação.",
+    });
+  };
+
   const getReportIcon = (category: ConversationalReport['category']) => {
     switch (category) {
       case 'performance':
@@ -279,7 +310,11 @@ export function ConversationalReports() {
               Relatórios inteligentes com explicações em áudio
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => generateNewReport()}
+          >
             <Calendar className="h-4 w-4 mr-2" />
             Gerar Novo
           </Button>

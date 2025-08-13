@@ -9,6 +9,7 @@ import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { SmartInsights } from '@/components/insights/SmartInsights';
 import { ConversationalReports } from '@/components/reports/ConversationalReports';
 import { UserModal } from '@/components/modals/UserModal';
+import { ModelConfigModal } from '@/components/modals/ModelConfigModal';
 import { useState } from 'react';
 import { 
   Server,
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
 
   // Modal state
   const [userModal, setUserModal] = useState({ isOpen: false, user: null });
+  const [modelConfigModal, setModelConfigModal] = useState(false);
 
   // System users state
   const [systemUsers, setSystemUsers] = useState([
@@ -164,8 +166,12 @@ export default function AdminDashboard() {
                   <span className="text-sm">Próximo Treinamento</span>
                   <span className="text-sm text-muted-foreground">15/02/2025</span>
                 </div>
-                <Button className="w-full" variant="outline">
-                  <Settings className="w-4 h-4 mr-2" />
+                <Button 
+                  className="w-full" 
+                  variant="outline"
+                  onClick={() => setModelConfigModal(true)}
+                >
+                  <Settings className="w-4 w-4 mr-2" />
                   Configurar Modelo
                 </Button>
               </div>
@@ -301,6 +307,12 @@ export default function AdminDashboard() {
         onClose={() => setUserModal({ isOpen: false, user: null })}
         user={userModal.user}
         onSave={handleSaveUser}
+      />
+
+      {/* Model Config Modal */}
+      <ModelConfigModal
+        isOpen={modelConfigModal}
+        onClose={() => setModelConfigModal(false)}
       />
       
       <ChatAssistant
