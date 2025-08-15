@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type UserRole = 'admin' | 'manager';
+export type UserRole = 'admin' | 'manager' | 'agent';
 
 export interface User {
   id: string;
@@ -31,6 +31,18 @@ const DEMO_USERS: User[] = [
     name: 'Guilherme Silva',
     email: 'gestor@demo.com',
     role: 'manager'
+  },
+  {
+    id: '3',
+    name: 'Carlos Vendedor',
+    email: 'carlos@demo.com',
+    role: 'agent'
+  },
+  {
+    id: '4',
+    name: 'Ana Silva',
+    email: 'ana@demo.com',
+    role: 'agent'
   }
 ];
 
