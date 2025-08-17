@@ -1,10 +1,10 @@
-Gym Churn AI Platform
-🏋️‍♂️ Descrição
+#Gym Churn AI Platform
+##🏋️‍♂️ Descrição
 A Gym Churn AI Platform é uma solução inteligente projetada para academias e estúdios fitness que buscam reduzir a taxa de cancelamento de matrículas (churn). A ferramenta utiliza Inteligência Artificial para analisar transcrições de conversas do WhatsApp entre vendedores e alunos, identificando padrões de comportamento e prevendo o risco de churn.
 
 Com base na metodologia C.A.R.E. (Conexão, Análise, Resolução e Engajamento), a plataforma avalia a qualidade das interações e fornece insights valiosos para reter clientes e melhorar a performance da equipe.
 
-✨ Funcionalidades Principais
+###✨ Funcionalidades Principais
 Análise de Conversas com IA: Faça upload de áudios ou transcrições de conversas para uma análise automática e detalhada.
 
 Metodologia C.A.R.E.: Avaliação de conversas baseada em 4 pilares: Conexão, Análise, Resolução e Engajamento.
@@ -25,7 +25,7 @@ Relatórios Conversacionais: Gere relatórios com explicações em áudio sobre 
 
 Assistente Virtual com IA: Interaja com um chatbot para obter análises rápidas sobre os dados do dashboard.
 
-🏗️ Arquitetura e Fluxo da Aplicação
+###🏗️ Arquitetura e Fluxo da Aplicação
 O diagrama abaixo ilustra a arquitetura geral da aplicação, desde a autenticação até a análise de dados pela IA.
 
 Snippet de código
@@ -74,7 +74,7 @@ graph TD
 
     classDef user fill:#fff,stroke:#333,stroke-width:2px;
     class A,B,C,F,E,D user;
-🚀 Tecnologias Utilizadas
+##🚀 Tecnologias Utilizadas
 Este projeto foi construído com as seguintes tecnologias:
 
 Frontend: Vite, React, TypeScript
@@ -91,7 +91,7 @@ Gráficos: Recharts
 
 Formulários: React Hook Form
 
-🛠️ Como Executar o Projeto Localmente
+##🛠️ Como Executar o Projeto Localmente
 Para rodar este projeto em sua máquina local, siga os passos abaixo. É necessário ter o Node.js e o npm instalados.
 
 Bash
